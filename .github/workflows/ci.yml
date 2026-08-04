@@ -53,4 +53,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: code-coverage-report
-          path: /**/coverage.cobertura.xml
+          path: "**/coverage.cobertura.xml"
