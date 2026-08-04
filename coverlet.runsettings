@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RunSettings>
+  <DataCollectionRunSettings>
+    <DataCollectors>
+      <DataCollector friendlyName="XPlat Code Coverage">
+        <Configuration>
+          <Format>cobertura</Format>
+          <!-- Views 配下および WPF UI 関連コンバーター、自動生成コードをカバレッジ対象から除外 -->
+          <Exclude>[*]KeyValues.Views.*,[*]KeyValues.Converters.*,[*]KeyValues.App,[*]XamlGeneratedNamespace.*</Exclude>
+        </Configuration>
+      </DataCollector>
+    </DataCollectors>
+  </DataCollectionRunSettings>
+</RunSettings>

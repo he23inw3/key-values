@@ -1,0 +1,54 @@
+name: CD (Release Build)
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release-build:
+    name: Build & Upload Release Artifact
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Publish single executable
+        run: dotnet publish src/KeyValues/KeyValues.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+
+      - name: Compress Executable into Zip
+        shell: pwsh
+        run: |
+          $exePath = "src/KeyValues/bin/Release/net10.0-windows10.0.19041.0/win-x64/publish/KeyValues.exe"
+          $zipName = "KeyValues-${{ github.ref_name }}-win-x64.zip"
+          Compress-Archive -Path $exePath -DestinationPath $zipName
+
+      - name: Upload Zip Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: KeyValues-${{ github.ref_name }}-win-x64
+          path: KeyValues-${{ github.ref_name }}-win-x64.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: KeyValues-${{ github.ref_name }}-win-x64.zip
+          name: Release ${{ github.ref_name }}
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+

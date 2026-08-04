@@ -1,0 +1,56 @@
+name: CI (Test)
+
+on:
+  push:
+    branches: ["feature/**", "main", "master"]
+  pull_request:
+    branches: ["feature/**", "main", "master"]
+
+jobs:
+  test:
+    name: Run Unit Tests & Code Coverage
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 10 SDK
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: dotnet build --configuration Release --no-restore
+
+      - name: Run unit tests with code coverage
+        run: dotnet test --configuration Release --no-build --collect:"XPlat Code Coverage" --settings coverlet.runsettings
+
+      - name: Check code coverage threshold with ReportGenerator (70%)
+        shell: pwsh
+        run: |
+          dotnet tool install -g dotnet-reportgenerator-globaltool
+          reportgenerator "-reports:**/coverage.cobertura.xml" "-targetdir:coveragereport" "-reporttypes:TextSummary;MarkdownSummaryGithub;JsonSummary"
+
+          if (Test-Path coveragereport/SummaryGithub.md) {
+            Get-Content coveragereport/SummaryGithub.md | Out-File -FilePath $env:GITHUB_STEP_SUMMARY -Encoding utf8
+          }
+
+          if (Test-Path coveragereport/Summary.json) {
+            $json = Get-Content coveragereport/Summary.json | ConvertFrom-Json
+            $coverage = [double]$json.summary.linecoverage
+            Write-Host "Total Line Coverage: $coverage%"
+            if ($coverage -lt 70.0) {
+              Write-Error "Code coverage ($coverage%) is below the required threshold of 70%."
+              exit 1
+            }
+          }
+
+      - name: Upload code coverage results
+        uses: actions/upload-artifact@v4
+        with:
+          name: code-coverage-report
+          path: /**/coverage.cobertura.xml

@@ -1,0 +1,75 @@
+## .NET Build / Output / Publish
+[Bb]in/
+[Oo]bj/
+[Pp]ublish/
+out/
+[Ll]og/
+[Ll]ogs/
+*.log
+
+## NuGet Packages
+*.nupkg
+*.snupkg
+**/packages/
+!**/packages/build/
+
+## Automated Test Outputs & Code Coverage
+TestResults/
+coveragereport/
+*.cobertura.xml
+*.coverage
+*.coveragexml
+
+## Visual Studio
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+*.userprefs
+*.DotSettings.user
+*.cache
+*.aps
+*.ncb
+*.opendb
+*.sdf
+*.pidb
+*.dbmdl
+*.vsp
+*.vsps
+*.vspx
+*.sap
+
+## VS Code & Rider
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+
+## SQLite & Local LMS Data Files (DO NOT COMMIT!)
+data/
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.db.bak
+autologin.dat
+*.dat
+*.dat.bak
+*.cfg
+test-*.db
+*.test.db
+
+## Antigravity IDE & Agent Workspace
+.gemini/
+.agents/
+.system_generated/
+brain/
+
+## OS Generated Files
+[Tt]humbs.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.tmp

@@ -1,0 +1,420 @@
+<UserControl x:Class="KeyValues.Views.Components.AccountDetailPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converters="clr-namespace:KeyValues.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="550" d:DesignWidth="650">
+    <UserControl.Resources>
+        <converters:VisibilityConverter x:Key="VisibilityConverter" />
+        <converters:InvertedVisibilityConverter x:Key="InvertedVisibilityConverter" />
+        <converters:StringVisibilityConverter x:Key="StringVisibilityConverter" />
+        <converters:VisibilityIconConverter x:Key="VisibilityIconConverter" />
+    </UserControl.Resources>
+
+    <Grid>
+        <!-- 1. Placeholder when NO entry is selected -->
+        <Grid x:Name="PlaceholderGrid" 
+              Visibility="{Binding IsSelected, Converter={StaticResource InvertedVisibilityConverter}, FallbackValue=Visible}">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock FontFamily="{StaticResource FluentIcons}" 
+                           Text="&#xE72E;" 
+                           FontSize="64" 
+                           Foreground="{DynamicResource BorderBrush}"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="アカウント情報が選択されていません" 
+                           FontSize="15" 
+                           FontWeight="SemiBold"
+                           Foreground="{DynamicResource TextSecondaryBrush}" 
+                           Margin="0,16,0,4"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="左側のリストからアカウントを選択するか、追加ボタンをクリックしてください。" 
+                           FontSize="12" 
+                           Foreground="{DynamicResource TextSecondaryBrush}" 
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- 2. Details / Edit view -->
+        <Grid x:Name="DetailsGrid" 
+              Margin="24"
+              Visibility="{Binding IsSelected, Converter={StaticResource VisibilityConverter}, FallbackValue=Collapsed}">
+            
+            <!-- View Mode -->
+            <Grid Visibility="{Binding IsEditMode, Converter={StaticResource InvertedVisibilityConverter}, FallbackValue=Visible}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" /> <!-- Header (Service name & edit/delete actions) -->
+                    <RowDefinition Height="*" />    <!-- Content cards -->
+                </Grid.RowDefinitions>
+
+                <!-- Detail Header -->
+                <Grid Grid.Row="0" Margin="0,0,0,24">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock Text="{Binding SelectedEntry.ServiceName}" 
+                                   FontSize="24" 
+                                   FontWeight="Bold"
+                                   TextWrapping="Wrap"/>
+                        <TextBlock Text="{Binding SelectedEntry.UpdatedAt, StringFormat={}最終更新日: {0:yyyy/MM/dd HH:mm}}" 
+                                   FontSize="11" 
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Margin="0,4,0,0"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                        <Button Command="{Binding EditEntryCommand}" 
+                                Style="{StaticResource ModernButton}" 
+                                Margin="0,0,8,0"
+                                Padding="14,8">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="{StaticResource FluentIcons}" Text="&#xE70F;" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock Text="編集" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding DeleteEntryCommand}" 
+                                Style="{StaticResource DangerButton}"
+                                Padding="14,8">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock FontFamily="{StaticResource FluentIcons}" Text="&#xE74D;" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock Text="削除" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Detail Content -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,0,12,0">
+                        
+                        <!-- Card: Login ID -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}" 
+                                BorderBrush="{DynamicResource BorderBrush}" 
+                                BorderThickness="1" 
+                                CornerRadius="8" 
+                                Padding="16" 
+                                Margin="0,0,0,16">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="ログインID / ユーザー名" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    <TextBlock Text="{Binding SelectedEntry.LoginId}" FontSize="16" FontWeight="SemiBold" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" 
+                                        Command="{Binding CopyIdCommand}"
+                                        Style="{StaticResource ModernButton}" 
+                                        Padding="10,8" 
+                                        VerticalAlignment="Center">
+                                    <TextBlock FontFamily="{StaticResource FluentIcons}" Text="&#xE8C8;" />
+                                </Button>
+                            </Grid>
+                        </Border>
+
+                        <!-- Card: Password -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}" 
+                                BorderBrush="{DynamicResource BorderBrush}" 
+                                BorderThickness="1" 
+                                CornerRadius="8" 
+                                Padding="16" 
+                                Margin="0,0,0,16">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="パスワード" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    <!-- Masked text -->
+                                    <TextBlock Text="••••••••••••" 
+                                               FontSize="18" 
+                                               FontWeight="Bold" 
+                                               Margin="0,6,0,0"
+                                               VerticalAlignment="Center"
+                                               Visibility="{Binding IsPasswordVisible, Converter={StaticResource InvertedVisibilityConverter}}"/>
+                                    <!-- Plain text -->
+                                    <TextBlock Text="{Binding SelectedEntry.Password}" 
+                                               FontSize="16" 
+                                               FontWeight="SemiBold" 
+                                               Margin="0,6,0,0"
+                                               VerticalAlignment="Center"
+                                               TextWrapping="Wrap"
+                                               Visibility="{Binding IsPasswordVisible, Converter={StaticResource VisibilityConverter}}"/>
+                                </StackPanel>
+                                
+                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                    <!-- Toggle Visibility -->
+                                    <Button Command="{Binding TogglePasswordVisibilityCommand}"
+                                            Style="{StaticResource ModernButton}" 
+                                            Padding="10,8" 
+                                            Margin="0,0,6,0">
+                                        <TextBlock FontFamily="{StaticResource FluentIcons}" 
+                                                   Text="{Binding IsPasswordVisible, Converter={StaticResource VisibilityIconConverter}, FallbackValue=&#xE890;}" />
+                                    </Button>
+                                    <!-- Copy -->
+                                    <Button Command="{Binding CopyPasswordCommand}"
+                                            Style="{StaticResource ModernButton}" 
+                                            Padding="10,8">
+                                        <TextBlock FontFamily="{StaticResource FluentIcons}" Text="&#xE8C8;" />
+                                    </Button>
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+
+                        <!-- Card: URL -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}" 
+                                BorderBrush="{DynamicResource BorderBrush}" 
+                                BorderThickness="1" 
+                                CornerRadius="8" 
+                                Padding="16" 
+                                Margin="0,0,0,16"
+                                Visibility="{Binding SelectedEntry.Url, Converter={StaticResource StringVisibilityConverter}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel>
+                                    <TextBlock Text="URL / ログインページ" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                    <TextBlock Text="{Binding SelectedEntry.Url}" FontSize="14" Foreground="{DynamicResource AccentBrush}" Margin="0,6,0,0" TextWrapping="Wrap"/>
+                                </StackPanel>
+                                <Button Grid.Column="1" 
+                                        Command="{Binding OpenUrlCommand}"
+                                        Style="{StaticResource ModernButton}" 
+                                        Padding="10,8" 
+                                        VerticalAlignment="Center">
+                                    <TextBlock FontFamily="{StaticResource FluentIcons}" Text="&#xE71B;" />
+                                </Button>
+                            </Grid>
+                        </Border>
+
+                        <!-- Card: Memo -->
+                        <Border Background="{DynamicResource CardBackgroundBrush}" 
+                                BorderBrush="{DynamicResource BorderBrush}" 
+                                BorderThickness="1" 
+                                CornerRadius="8" 
+                                Padding="16" 
+                                Margin="0,0,0,8"
+                                Visibility="{Binding SelectedEntry.Memo, Converter={StaticResource StringVisibilityConverter}}">
+                            <StackPanel>
+                                <TextBlock Text="メモ" FontSize="11" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                                <TextBlock Text="{Binding SelectedEntry.Memo}" FontSize="13" Margin="0,8,0,0" TextWrapping="Wrap" LineHeight="18"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Grid>
+
+            <!-- Edit Mode -->
+            <Grid Visibility="{Binding IsEditMode, Converter={StaticResource VisibilityConverter}, FallbackValue=Collapsed}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" /> <!-- Header -->
+                    <RowDefinition Height="*" />    <!-- Edit Fields -->
+                    <RowDefinition Height="Auto" /> <!-- Actions -->
+                </Grid.RowDefinitions>
+
+                <!-- Edit Header -->
+                <TextBlock Grid.Row="0" 
+                           Text="アカウント情報の編集" 
+                           FontSize="20" 
+                           FontWeight="Bold" 
+                           Margin="0,0,0,20"/>
+
+                <!-- Edit Fields -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <StackPanel Margin="0,0,12,0">
+                        
+                        <!-- Service Name -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="サービス名（例: Amazon, Google）" 
+                                       Foreground="{DynamicResource TextSecondaryBrush}" 
+                                       FontSize="11" 
+                                       VerticalAlignment="Center"/>
+                            <Border Background="{DynamicResource DangerBrush}" 
+                                    CornerRadius="3" 
+                                    Padding="4,1" 
+                                    Margin="6,0,0,0" 
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="必須" FontSize="9" Foreground="#FFFFFF" FontWeight="Bold"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBox Text="{Binding EditBuffer.ServiceName, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,16"/>
+
+                        <!-- Login ID -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="ログインID / メールアドレス" 
+                                       Foreground="{DynamicResource TextSecondaryBrush}" 
+                                       FontSize="11" 
+                                       VerticalAlignment="Center"/>
+                            <Border Background="{DynamicResource DangerBrush}" 
+                                    CornerRadius="3" 
+                                    Padding="4,1" 
+                                    Margin="6,0,0,0" 
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="必須" FontSize="9" Foreground="#FFFFFF" FontWeight="Bold"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBox Text="{Binding EditBuffer.LoginId, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,16"/>
+
+                        <!-- Password with generator option -->
+                        <Grid Margin="0,0,0,16">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Grid.Row="0" Grid.Column="0" Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="パスワード" 
+                                           Foreground="{DynamicResource TextSecondaryBrush}" 
+                                           FontSize="11" 
+                                           VerticalAlignment="Center"/>
+                                <Border Background="{DynamicResource DangerBrush}" 
+                                        CornerRadius="3" 
+                                        Padding="4,1" 
+                                        Margin="6,0,0,0" 
+                                        VerticalAlignment="Center">
+                                    <TextBlock Text="必須" FontSize="9" Foreground="#FFFFFF" FontWeight="Bold"/>
+                                </Border>
+                            </StackPanel>
+                            <TextBox Grid.Row="1" Grid.Column="0" 
+                                     Text="{Binding EditBuffer.Password, UpdateSourceTrigger=PropertyChanged}"/>
+                            <Button Grid.Row="1" Grid.Column="1" 
+                                    Command="{Binding OpenGeneratorCommand}"
+                                    Style="{StaticResource ModernButton}" 
+                                    BorderThickness="0,1,1,1"
+                                    Padding="12,0"
+                                    ToolTip="ランダムで強固なパスワードを生成します">
+                                <TextBlock FontFamily="{StaticResource FluentIcons}" Text="&#xE945;" />
+                            </Button>
+                        </Grid>
+
+                        <!-- Password Generator Panel (Expandable) -->
+                        <Border BorderBrush="{DynamicResource BorderBrush}" 
+                                BorderThickness="1" 
+                                CornerRadius="6" 
+                                Background="{DynamicResource WindowBackgroundBrush}"
+                                Padding="16" 
+                                Margin="0,0,0,16"
+                                DataContext="{Binding PasswordGenerator}"
+                                Visibility="{Binding IsGeneratorOpen, Converter={StaticResource VisibilityConverter}, FallbackValue=Collapsed}">
+                            <StackPanel>
+                                <TextBlock Text="パスワード生成ツール" FontWeight="Bold" Margin="0,0,0,12" FontSize="13"/>
+                                
+                                <!-- Character selection options -->
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <CheckBox Grid.Column="0" Content="A-Z (大文字)" IsChecked="{Binding GenUseUppercase}" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                    <CheckBox Grid.Column="1" Content="a-z (小文字)" IsChecked="{Binding GenUseLowercase}" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                    <CheckBox Grid.Column="2" Content="0-9 (数字)" IsChecked="{Binding GenUseDigits}" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                    <CheckBox Grid.Column="3" Content="記号" IsChecked="{Binding GenUseSymbols}" Foreground="{DynamicResource TextPrimaryBrush}"/>
+                                </Grid>
+
+                                <!-- Length -->
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="長さ: " VerticalAlignment="Center" Margin="0,0,8,0" FontSize="12"/>
+                                    <Slider Grid.Column="1" Minimum="8" Maximum="32" Value="{Binding GenLength}" IsSnapToTickEnabled="True" TickFrequency="1" VerticalAlignment="Center"/>
+                                    <TextBlock Grid.Column="2" Text="{Binding GenLength}" VerticalAlignment="Center" Margin="8,0,0,0" FontWeight="Bold" FontSize="13" Width="20" TextAlignment="Right"/>
+                                </Grid>
+
+                                <!-- Actions -->
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <!-- Generated output -->
+                                    <TextBox Text="{Binding GeneratedPassword, Mode=OneWay}" 
+                                             IsReadOnly="True" 
+                                             Background="{DynamicResource CardBackgroundBrush}"
+                                             Padding="8,6"
+                                             FontSize="13"/>
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0,0,0">
+                                        <Button Command="{Binding GeneratePasswordCommand}" 
+                                                Style="{StaticResource ModernButton}" 
+                                                Content="生成"
+                                                Margin="0,0,6,0"/>
+                                        <Button Command="{Binding ApplyGeneratedPasswordCommand}" 
+                                                Style="{StaticResource AccentButton}" 
+                                                Content="適用"/>
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- URL -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="URL (例: https://amazon.co.jp)" 
+                                       Foreground="{DynamicResource TextSecondaryBrush}" 
+                                       FontSize="11" 
+                                       VerticalAlignment="Center"/>
+                            <Border Background="{DynamicResource InputBackgroundBrush}" 
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="3" 
+                                    Padding="4,1" 
+                                    Margin="6,0,0,0" 
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="任意" FontSize="9" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBox Text="{Binding EditBuffer.Url, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,16"/>
+
+                        <!-- Memo -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                            <TextBlock Text="メモ" 
+                                       Foreground="{DynamicResource TextSecondaryBrush}" 
+                                       FontSize="11" 
+                                       VerticalAlignment="Center"/>
+                            <Border Background="{DynamicResource InputBackgroundBrush}" 
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="1"
+                                    CornerRadius="3" 
+                                    Padding="4,1" 
+                                    Margin="6,0,0,0" 
+                                    VerticalAlignment="Center">
+                                <TextBlock Text="任意" FontSize="9" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                            </Border>
+                        </StackPanel>
+                        <TextBox Text="{Binding EditBuffer.Memo, UpdateSourceTrigger=PropertyChanged}" 
+                                 AcceptsReturn="True" 
+                                 MinHeight="100" 
+                                 TextWrapping="Wrap" 
+                                 VerticalScrollBarVisibility="Auto"
+                                 Margin="0,0,0,16"/>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <!-- Edit Actions -->
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,16,12,0">
+                    <Button Command="{Binding CancelEditCommand}" 
+                            Content="キャンセル" 
+                            Style="{StaticResource ModernButton}" 
+                            Margin="0,0,8,0"
+                            Width="100"/>
+                    <Button Command="{Binding SaveEntryCommand}" 
+                            Content="保存" 
+                            Style="{StaticResource AccentButton}"
+                            Width="100"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

@@ -1,0 +1,94 @@
+<UserControl x:Class="KeyValues.Views.Components.AccountListPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:converters="clr-namespace:KeyValues.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="500" d:DesignWidth="340">
+    <UserControl.Resources>
+        <converters:VisibilityConverter x:Key="VisibilityConverter" />
+        <converters:InvertedVisibilityConverter x:Key="InvertedVisibilityConverter" />
+    </UserControl.Resources>
+
+    <Grid Margin="16,16,16,0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" /> <!-- Search Box -->
+            <RowDefinition Height="*" />    <!-- Account List -->
+            <RowDefinition Height="Auto" /> <!-- Add Button -->
+        </Grid.RowDefinitions>
+
+        <!-- Search Box -->
+        <Grid Grid.Row="0" Margin="0,0,0,12">
+            <TextBox Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" 
+                     Padding="32,8,8,8"
+                     Tag="検索..." />
+            <TextBlock FontFamily="{StaticResource FluentIcons}" 
+                       Text="&#xE721;" 
+                       FontSize="13"
+                       Foreground="{DynamicResource TextSecondaryBrush}" 
+                       IsHitTestVisible="False" 
+                       VerticalAlignment="Center" 
+                       HorizontalAlignment="Left" 
+                       Margin="10,0,0,0" />
+            <!-- Placeholder Text for Search Box -->
+            <TextBlock Text="サービス名やIDで検索..." 
+                       Foreground="{DynamicResource TextSecondaryBrush}" 
+                       IsHitTestVisible="False" 
+                       VerticalAlignment="Center" 
+                       Margin="32,0,0,0" 
+                       FontSize="13"
+                       Visibility="{Binding SearchText, Converter={StaticResource InvertedVisibilityConverter}, FallbackValue=Visible}"/>
+        </Grid>
+
+        <!-- Account List -->
+        <ListBox Grid.Row="1" 
+                 ItemsSource="{Binding FilteredEntries}" 
+                 SelectedItem="{Binding SelectedEntry}"
+                 Margin="0,0,0,12">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="2,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.Row="0" Grid.Column="0" 
+                                   Text="{Binding ServiceName}" 
+                                   FontWeight="Bold" 
+                                   FontSize="14" 
+                                   TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Grid.Row="1" Grid.Column="0" 
+                                   Text="{Binding LoginId}" 
+                                   FontSize="12" 
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   Margin="0,2,0,0"
+                                   TextTrimming="CharacterEllipsis"/>
+                        <TextBlock Grid.Row="0" Grid.Column="1" Grid.RowSpan="2"
+                                   Text="{Binding UpdatedAt, StringFormat={}{0:MM/dd}}" 
+                                   FontSize="10" 
+                                   Foreground="{DynamicResource TextSecondaryBrush}"
+                                   VerticalAlignment="Center"
+                                   Margin="8,0,0,0"/>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Add Button -->
+        <Button Grid.Row="2" 
+                Command="{Binding AddEntryCommand}" 
+                Style="{StaticResource AccentButton}" 
+                Margin="0,0,0,16"
+                Height="40">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock FontFamily="{StaticResource FluentIcons}" Text="&#xE710;" VerticalAlignment="Center" Margin="0,0,8,0" FontSize="14"/>
+                <TextBlock Text="新規アカウント追加" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
+    </Grid>
+</UserControl>
